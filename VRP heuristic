@@ -1,0 +1,42 @@
+def heur_vrp(points, d, c):
+    # assign points to nodes, for example, (30,40):0...
+    Nodes = dict()
+    for node,point in enumerate(points):
+        Nodes[point]=node
+    
+    depot_point, customers_points = points[0], points[1:]
+    load = c
+    depot = 0
+    distance = 0
+    routes = [depot]
+    routes_point = [depot_point]
+    unvisited = customers_points 
+    
+    while unvisited: # while there is still unvisited customers 
+        C = min(unvisited, key=lambda c: dist(c, routes_point[-1])) #get the point that has the min distance from the last point
+        distance += dist(C, routes_point[-1]) #calculate the distance between the two points
+        routes_point.append(C)
+        index = unvisited.index(C) 
+        routes.append(Nodes[C]) # append the node that corresponds to the closest point
+        load -= (d[index]) # reduce the load by the customer's demand
+        d.remove(d[index]) # remove the demand that was satisfied 
+        unvisited.remove(C) #remove the point from the unvisited customer lists
+        
+        if d[index] > load: #if the demand exceeds the remaining load
+            distance += dist(depot_point, routes_point[-1]) #calculate the difference between the depot and the last point
+            routes_point.append(depot_point)
+            routes.append(depot)
+            load = c #restart with a new load
+        continue
+    #add the final distance of the final track 
+    distance += dist(depot_point, routes_point[-1])
+    routes_point.append(depot_point)
+    routes.append(depot)
+    ### to plot the route 
+#     final_route = []
+#     for i in range(len(routes)-1):
+#         tuples= tuple((routes[i], routes[i+1]))
+#         final_route.append(tuples)
+#     plot_vrp(points, [final_route])
+    
+    return distance
